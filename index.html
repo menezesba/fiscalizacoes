@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#123d32">
-<title>Fiscal Ambiental Irecê • versão 5</title>
+<title>Fiscal Ambiental Irecê • versão 6</title>
 <style>
 :root{--green:#123d32;--green2:#1c6650;--bg:#f3f6f4;--card:#fff;--text:#17231e;--muted:#617069;--line:#dce5df;--orange:#a45b10;--danger:#a52b2b;--radius:16px}
 *{box-sizing:border-box}
@@ -19,7 +19,7 @@ h1{font-size:19px;line-height:1.15;margin:0 0 4px}
 .subtitle{font-size:12px;color:#d4e5dc}
 .wrap{max-width:1000px;margin:0 auto;padding:14px 12px 90px}
 .notice{background:#fff7e8;border:1px solid #f0d8a9;color:#68430d;padding:12px 14px;border-radius:12px;font-size:13px;margin-bottom:14px}
-.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-bottom:14px}
+.tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-bottom:14px}
 .tab{border:1px solid var(--line);background:white;color:var(--green);padding:10px 5px;border-radius:11px;font-size:12px;font-weight:700}
 .tab.active{background:var(--green);color:white;border-color:var(--green)}
 .panel{display:none}.panel.active{display:block}
@@ -99,7 +99,7 @@ footer{font-size:11px;color:var(--muted);text-align:center;padding:16px}
 <header class="topbar">
  <div class="topline">
   <div class="logo">🌿</div>
-  <div><h1>Fiscal Ambiental Irecê</h1><div class="subtitle">Versão 5 • uso em celular e tablet na vertical</div></div>
+  <div><h1>Fiscal Ambiental Irecê</h1><div class="subtitle">Versão 6 • uso em celular e tablet na vertical</div></div>
  </div>
 </header>
 <main class="wrap">
@@ -109,6 +109,7 @@ footer{font-size:11px;color:var(--muted);text-align:center;padding:16px}
   <button class="tab" data-tab="arquivo">Arquivo</button>
   <button class="tab" data-tab="leis">Legislação</button>
   <button class="tab" data-tab="fiscal">Fiscal</button>
+  <button class="tab" data-tab="rfa">RFA</button>
  </nav>
 
  <section id="novo" class="panel active">
@@ -155,11 +156,10 @@ footer{font-size:11px;color:var(--muted);text-align:center;padding:16px}
      <div class="field"><label for="local">Endereço / descrição do local da ocorrência</label><input id="local" placeholder="Propriedade, estrada, referência"></div>
      <div class="field"><label for="gps">Coordenadas GPS da ocorrência</label><input id="gps" placeholder="Latitude, longitude" readonly></div>
      <div class="field"><label for="precisao">Precisão estimada</label><input id="precisao" readonly placeholder="Aguardando GPS"></div>
-     <div class="field"><label>Mapa</label><a id="mapLink" class="maplink" href="#" target="_blank" rel="noopener">Obter coordenadas para habilitar o mapa</a></div>
+     <div class="field"><label>Mapa / coordenadas</label><a id="mapLink" class="maplink" href="#" target="_blank" rel="noopener">As coordenadas aparecerão aqui após a captura</a></div>
     </div>
     <div class="btnrow no-print">
      <button type="button" class="btn secondary" id="capturarGps">Capturar minha localização</button>
-     <button type="button" class="btn outline" id="abrirMapa" disabled>Abrir no Google Maps</button>
     </div>
     <p class="help">Autorize a localização no navegador. O GPS indica a posição do aparelho e deve ser conferido para garantir que corresponde ao ponto fiscalizado.</p>
    </div>
@@ -172,7 +172,7 @@ footer{font-size:11px;color:var(--muted);text-align:center;padding:16px}
      <div class="field"><label for="descricao">Descrição objetiva dos fatos *</label><textarea id="descricao" required placeholder="Descreva o que foi constatado, onde e em quais circunstâncias."></textarea></div>
      <div class="field"><label for="medida">Medida / providência adotada</label><textarea id="medida" placeholder="Informe a medida aplicada e a base que a autoriza."></textarea></div>
      <div class="field"><label for="prazo">Prazo / orientação para defesa</label><input id="prazo" placeholder="Conforme a norma aplicável"></div>
-     <div class="field" id="campoMulta"><label for="valor">Valor da multa</label><input id="valor" inputmode="decimal" placeholder="R$ 0,00"></div>
+     <div class="field" id="campoMulta"><label for="valor">Valor da multa (R$)</label><input id="valor" inputmode="decimal" autocomplete="off" placeholder="Ex.: 1500,00" aria-describedby="ajudaValorMulta"><p id="ajudaValorMulta" class="help">Digite o valor com até duas casas decimais. Ex.: 1500,50.</p></div>
     </div>
    </div>
 
@@ -280,6 +280,14 @@ footer{font-size:11px;color:var(--muted);text-align:center;padding:16px}
   </div>
  </section>
 
+ <section id="rfa" class="panel">
+  <div class="card">
+   <h2>Relatório de Fiscalização Ambiental (RFA)</h2>
+   <p>Esta aba está reservada para o modelo de RFA que você enviará. Quando você compartilhar o modelo, construiremos os campos e o PDF conforme a estrutura oficial, sem presumir conteúdo ou formato antes de analisá-lo.</p>
+   <p class="help">Por enquanto, esta aba é apenas um espaço reservado e ainda não gera RFA.</p>
+  </div>
+ </section>
+
  <section id="printArea" class="hidden"></section>
  <footer>Fiscal Ambiental Irecê • Protótipo de desenvolvimento • Validar juridicamente antes do uso oficial.</footer>
 </main>
@@ -311,6 +319,41 @@ function renderLawChoices(){const el=$('legalChoices');el.innerHTML=laws.map(l=>
 function renderLaws(){const el=$('lawsList');el.innerHTML=laws.map(l=>`<div class="item"><div class="itemtop"><strong>${esc(l.name)} ${esc(l.device)}</strong><span class="pill">${esc(l.topic)}</span></div><p>${esc(l.note||'')}</p><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.url)}</a>${l.custom?`<div class="btnrow"><button class="btn danger" data-delete-law="${esc(l.id)}">Excluir referência</button></div>`:''}</div>`).join('');renderLawChoices()}
 function switchTab(name){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===name));if(name==='arquivo')renderArchive();if(name==='leis')renderLaws();window.scrollTo({top:0,behavior:'smooth'})}
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+function parseMoneyBR(raw){
+ let t=String(raw??'').trim().replace(/R\$/gi,'').replace(/\s/g,'');
+ if(!t)return NaN;
+ if(t.includes(',')){t=t.replace(/\./g,'').replace(',','.');}
+ else if(t.includes('.')){const parts=t.split('.'),last=parts[parts.length-1];if(last.length===3)t=parts.join('');else if(parts.length>2)t=parts.slice(0,-1).join('')+'.'+last;}
+ const n=Number(t);return Number.isFinite(n)&&n>=0?n:NaN;
+}
+function currencyBR(n){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n)}
+function formatMoneyInput(){const el=$('valor'),n=parseMoneyBR(el.value);if(Number.isFinite(n))el.value=currencyBR(n)}
+$('valor').addEventListener('focus',()=>{const n=parseMoneyBR($('valor').value);if(Number.isFinite(n))$('valor').value=n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})});
+$('valor').addEventListener('blur',formatMoneyInput);
+function wordsUnder1000(n){
+ const u=['zero','um','dois','três','quatro','cinco','seis','sete','oito','nove','dez','onze','doze','treze','quatorze','quinze','dezesseis','dezessete','dezoito','dezenove'];
+ const t=['','','vinte','trinta','quarenta','cinquenta','sessenta','setenta','oitenta','noventa'];
+ const h=['','cento','duzentos','trezentos','quatrocentos','quinhentos','seiscentos','setecentos','oitocentos','novecentos'];
+ if(n<20)return u[n];
+ if(n<100)return t[Math.floor(n/10)]+(n%10?' e '+u[n%10]:'');
+ if(n===100)return 'cem';
+ return h[Math.floor(n/100)]+(n%100?' e '+wordsUnder1000(n%100):'');
+}
+function numberToWordsPT(n){
+ n=Math.floor(Math.abs(n));if(n<1000)return wordsUnder1000(n);
+ if(n<1000000){const q=Math.floor(n/1000),r=n%1000;return (q===1?'mil':wordsUnder1000(q)+' mil')+(r?(r<100||r%100===0?' e ':' ')+wordsUnder1000(r):'');}
+ if(n<1000000000){const q=Math.floor(n/1000000),r=n%1000000;return (q===1?'um milhão':numberToWordsPT(q)+' milhões')+(r?(r<100||r%1000===0?' e ':', ')+numberToWordsPT(r):'');}
+ return n.toLocaleString('pt-BR');
+}
+function moneyInWords(raw){
+ const n=parseMoneyBR(raw);if(!Number.isFinite(n))return '';
+ const cents=Math.round(n*100),whole=Math.floor(cents/100),fraction=cents%100;
+ let out=whole===1?'um real':numberToWordsPT(whole)+' reais';
+ if(fraction)out+=' e '+numberToWordsPT(fraction)+(fraction===1?' centavo':' centavos');
+ return out;
+}
+function moneyForStorage(raw){const n=parseMoneyBR(raw);return Number.isFinite(n)?currencyBR(n):String(raw||'')}
+
 function updateDocType(){const isNotice=$('tipo').value==='Notificação';$('campoMulta').classList.toggle('hidden',isNotice);if(isNotice)$('valor').value='';}
 $('tipo').addEventListener('change',()=>{updateDocType();if(!saved)resetNumber()});
 $('natureza').addEventListener('change',()=>{$('docId').placeholder=$('natureza').value==='PJ'?'00.000.000/0000-00':'000.000.000-00';$('docId').value=formatDoc($('docId').value);});
@@ -325,54 +368,95 @@ function first(...values){for(const v of values){if(v!==undefined&&v!==null&&Str
 function normalizeCnpjData(d,source){
  const est=d.estabelecimento||d.establishment||{};
  const addr=d.endereco||d.address||est||{};
- const cep=first(d.cep,est.cep,addr.cep,d.zip_code,d.zipCode);
+ const cidadeObj=est.cidade||d.cidade_obj||d.city_object||{};
+ const estadoObj=est.estado||d.estado_obj||d.state_object||{};
+ const cep=first(est.cep,d.cep,addr.cep,d.zip_code,d.zipCode);
  const logradouro=first(est.logradouro,d.logradouro,addr.logradouro,d.street);
- const tipoLogradouro=first(est.descricao_tipo_de_logradouro,d.descricao_tipo_de_logradouro);
+ const tipoLogradouro=first(est.tipo_logradouro,est.descricao_tipo_de_logradouro,d.tipo_logradouro,d.descricao_tipo_de_logradouro);
  return {
-  razao:first(d.razao_social,d.razaoSocial,d.nome,d.company_name,d.companyName,d.nome_empresarial,d.raiz&&d.raiz.razao_social),
+  razao:first(d.razao_social,d.razaoSocial,d.nome_empresarial,d.nome,d.company_name,d.companyName,d.raiz&&d.raiz.razao_social,est.razao_social),
   fantasia:first(est.nome_fantasia,d.nome_fantasia,d.nomeFantasia,d.fantasia,d.trade_name,d.alias),
   logradouro:first(tipoLogradouro&&logradouro?tipoLogradouro+' '+logradouro:'',logradouro,d.street),
-  numero:first(est.numero,d.numero,addr.numero,d.number), complemento:first(est.complemento,d.complemento,addr.complemento,d.details),
-  bairro:first(est.bairro,d.bairro,addr.bairro,d.district), cidade:first(est.municipio&&est.municipio.descricao,est.municipio,d.municipio,addr.municipio,d.city,d.localidade),
-  uf:first(est.estado&&est.estado.sigla,est.uf,d.uf,addr.uf,d.state), cep:digits(cep).slice(0,8), source
+  numero:first(est.numero,d.numero,addr.numero,d.number),
+  complemento:first(est.complemento,d.complemento,addr.complemento,d.details),
+  bairro:first(est.bairro,d.bairro,addr.bairro,d.district),
+  cidade:first(cidadeObj.nome,cidadeObj.descricao,est.municipio&&typeof est.municipio==='object'?(est.municipio.descricao||est.municipio.nome):est.municipio,d.municipio,addr.municipio,d.city,d.localidade),
+  uf:first(estadoObj.sigla,estadoObj.uf,est.estado&&typeof est.estado==='object'?est.estado.sigla:est.uf,d.uf,addr.uf,d.state),
+  cep:digits(cep).slice(0,8), source
  };
 }
 async function lookupCnpj(){
  const id=digits(val('docId'));
  if($('natureza').value!=='PJ'){alert('A consulta cadastral automática está disponível somente para CNPJ. Para CPF, informe os dados conferidos por fonte autorizada.');return}
  if(id.length!==14){alert('Digite um CNPJ com 14 números.');return}
- $('docId').value=formatDoc(id);const b=$('buscarCnpj');b.disabled=true;b.textContent='Consultando...';$('status').textContent='Consultando bases públicas de CNPJ...';
+ if($('nome').dataset.cnpjLoading===id)return;
+ $('docId').value=formatDoc(id);
+ const b=$('buscarCnpj');b.disabled=true;b.textContent='Consultando...';
+ $('nome').dataset.cnpjLoading=id;
+ $('status').textContent='Consultando bases públicas de CNPJ. Isso pode levar alguns segundos...';
  const endpoints=[
-  {name:'BrasilAPI',url:`https://brasilapi.com.br/api/cnpj/v1/${id}`},
   {name:'Minha Receita',url:`https://minhareceita.org/${id}`},
+  {name:'BrasilAPI',url:`https://brasilapi.com.br/api/cnpj/v1/${id}`},
   {name:'CNPJ.ws',url:`https://publica.cnpj.ws/cnpj/${id}`}
  ];
- let result=null,errors=[];
+ let result=null;const errors=[];
  try{
   for(const ep of endpoints){
    try{
-    const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),9000);
-    const r=await fetch(ep.url,{signal:controller.signal,headers:{'Accept':'application/json'}});clearTimeout(timer);
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),6500);
+    let r;
+    try { r=await fetch(ep.url,{method:'GET',mode:'cors',cache:'no-store',signal:controller.signal,headers:{'Accept':'application/json'}}); }
+    finally { clearTimeout(timer); }
     if(!r.ok)throw Error(`${ep.name}: HTTP ${r.status}`);
-    const d=await r.json();const n=normalizeCnpjData(d,ep.name);
-    if(!n.razao)throw Error(`${ep.name}: resposta sem razão social`);
+    const d=await r.json();
+    const n=normalizeCnpjData(d,ep.name);
+    if(!n.razao)throw Error(`${ep.name}: a resposta não trouxe razão social`);
     result=n;break;
-   }catch(err){errors.push(err.message||ep.name)}
+   }catch(err){errors.push(`${ep.name}: ${err.name==='AbortError'?'tempo esgotado':(err.message||'falha na consulta')}`)}
   }
-  if(!result)throw Error('Nenhuma base respondeu com dados válidos.');
-  $('nome').value=result.razao;$('fantasia').value=result.fantasia;
+  if(!result)throw Error(errors.join(' | ')||'Nenhuma base retornou dados válidos.');
+  $('nome').value=result.razao;
+  $('fantasia').value=result.fantasia;
   if(result.cep.length===8)$('cep').value=result.cep.replace(/^(\d{5})(\d{3})$/,'$1-$2');
-  $('logradouro').value=result.logradouro;$('numeroEndereco').value=result.numero;$('complemento').value=result.complemento;$('bairro').value=result.bairro;$('cidade').value=result.cidade;$('uf').value=result.uf;
+  $('logradouro').value=result.logradouro;
+  $('numeroEndereco').value=result.numero;
+  $('complemento').value=result.complemento;
+  $('bairro').value=result.bairro;
+  $('cidade').value=result.cidade;
+  $('uf').value=result.uf;
   syncOccurrenceAddress();
-  if(result.cep.length===8 && (!result.logradouro||!result.bairro||!result.cidade)) { try { await lookupCep(false); } catch(_){} }
-  $('status').textContent=`Dados retornados pela base ${result.source}. Confira os dados antes de emitir.`;
+  $('status').textContent=`Consulta concluída pela base ${result.source}. Confira os dados antes de emitir.`;
  }catch(e){
-  $('status').textContent='Não foi possível obter os dados do CNPJ. Confira a conexão e tente novamente ou preencha os dados manualmente.';
-  alert('Não foi possível consultar esse CNPJ nas bases públicas agora. Isso pode ocorrer por instabilidade, limite de consultas ou bloqueio do navegador. Confira o CNPJ e tente novamente.');
- }finally{b.disabled=false;b.textContent='Consultar CNPJ'}
+  $('status').textContent='A consulta automática não conseguiu obter os dados. Verifique o CNPJ e tente novamente. Detalhes técnicos: '+errors.join(' | ');
+  alert('Não foi possível obter os dados desse CNPJ. As bases públicas podem estar indisponíveis, limitar consultas ou bloquear o acesso do navegador. Confira o CNPJ e tente novamente. Se continuar falhando, será necessário usar um serviço intermediário próprio para garantir a consulta.');
+ }finally{
+  delete $('nome').dataset.cnpjLoading;
+  b.disabled=false;b.textContent='Consultar CNPJ';
+ }
 }
-$('capturarGps').addEventListener('click',()=>{if(!navigator.geolocation){alert('Este navegador não disponibiliza geolocalização.');return}const b=$('capturarGps');b.disabled=true;b.textContent='Obtendo localização...';navigator.geolocation.getCurrentPosition(pos=>{const lat=pos.coords.latitude,lon=pos.coords.longitude;$('gps').value=`${lat.toFixed(6)}, ${lon.toFixed(6)}`;$('precisao').value=`± ${Math.round(pos.coords.accuracy)} metros`;$('mapLink').href=`https://www.google.com/maps?q=${lat},${lon}`;$('mapLink').textContent='Abrir coordenadas';$('abrirMapa').disabled=false;b.disabled=false;b.textContent='Capturar minha localização';},err=>{alert('Não foi possível obter a localização. Confira a permissão de GPS e tente novamente.');b.disabled=false;b.textContent='Capturar minha localização'},{enableHighAccuracy:true,timeout:15000,maximumAge:0})});
-$('abrirMapa').addEventListener('click',()=>{if(val('gps'))window.open('https://www.google.com/maps?q='+val('gps').replace(/\s/g,''),'_blank','noopener')});
+$('capturarGps').addEventListener('click',()=>{
+ if(!navigator.geolocation){alert('Este navegador não disponibiliza geolocalização.');return}
+ const b=$('capturarGps');b.disabled=true;b.textContent='Obtendo localização...';
+ // Abre uma aba a partir do toque do usuário para reduzir o risco de bloqueio do mapa.
+ let mapWindow=null;try{mapWindow=window.open('about:blank','_blank')}catch(_){}
+ navigator.geolocation.getCurrentPosition(pos=>{
+  const lat=pos.coords.latitude,lon=pos.coords.longitude;
+  const coords=`${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+  const mapUrl=`https://www.google.com/maps?q=${lat},${lon}`;
+  $('gps').value=coords;
+  $('precisao').value=`± ${Math.round(pos.coords.accuracy)} metros`;
+  $('mapLink').href=mapUrl;
+  $('mapLink').textContent=coords+' • abrir no Google Maps';
+  if(mapWindow&&!mapWindow.closed){mapWindow.location.href=mapUrl}
+  b.disabled=false;b.textContent='Capturar minha localização';
+  $('status').textContent='Coordenadas capturadas e vinculadas ao local da ocorrência. Confira se o ponto corresponde ao local fiscalizado.';
+ },err=>{
+  if(mapWindow&&!mapWindow.closed){try{mapWindow.close()}catch(_){}}
+  alert('Não foi possível obter a localização. Confira a permissão de localização do navegador e tente novamente.');
+  b.disabled=false;b.textContent='Capturar minha localização';
+ },{enableHighAccuracy:true,timeout:20000,maximumAge:0});
+});
 function setupCanvas(id){const c=$(id),ctx=c.getContext('2d');let drawing=false,hasInk=false;function resize(){const old=hasInk?c.toDataURL():null;const rect=c.getBoundingClientRect();const ratio=Math.max(window.devicePixelRatio||1,1);c.width=Math.max(1,Math.floor(rect.width*ratio));c.height=Math.floor(150*ratio);ctx.setTransform(ratio,0,0,ratio,0,0);ctx.lineWidth=2.2;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#13231b';if(old){const img=new Image();img.onload=()=>ctx.drawImage(img,0,0,rect.width,150);img.src=old}}function point(e){const r=c.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}function accepted(e){if(id!=='sigAutuado')return e.pointerType==='pen'||e.pointerType==='touch'||e.pointerType==='mouse';return $('modoAssinatura').value==='finger'?(e.pointerType==='touch'||e.pointerType==='mouse'):(e.pointerType==='pen');}c.addEventListener('pointerdown',e=>{if(!accepted(e)){return}e.preventDefault();drawing=true;hasInk=true;try{c.setPointerCapture(e.pointerId)}catch(_){}const p=point(e);ctx.beginPath();ctx.moveTo(p.x,p.y)});c.addEventListener('pointermove',e=>{if(!drawing)return;e.preventDefault();const p=point(e);ctx.lineTo(p.x,p.y);ctx.stroke()});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>c.addEventListener(ev,()=>drawing=false));c._clear=()=>{ctx.clearRect(0,0,c.width,c.height);hasInk=false};c._load=data=>{if(!data)return;const img=new Image();img.onload=()=>{const r=c.getBoundingClientRect();ctx.clearRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,r.width,r.height);hasInk=true};img.src=data};c._has=()=>hasInk;c._data=()=>hasInk?c.toDataURL('image/png'):'';setTimeout(resize,40);window.addEventListener('resize',()=>{if(!drawing)resize()});return c}
 const canvases={fiscal:setupCanvas('sigFiscal'),autuado:setupCanvas('sigAutuado'),cad:setupCanvas('cadSigFiscal')};
 function cadastralAddress(){return [val('logradouro'),val('numeroEndereco'),val('complemento'),val('bairro'),val('cidade'),val('uf'),val('cep')].filter(Boolean).join(', ')}
@@ -382,21 +466,21 @@ $('mesmoEnderecoOcorrencia').addEventListener('change',syncOccurrenceAddress);
 $('modoAssinatura').addEventListener('change',()=>{$('ajudaAssinatura').textContent=$('modoAssinatura').value==='pen'?'No modo caneta, somente a caneta compatível será aceita para desenhar; o dedo poderá ser usado para rolar a página.':'No modo dedo, o toque será usado para desenhar. Para rolar a página, toque fora da área de assinatura.';const c=$('sigAutuado');c.style.touchAction=$('modoAssinatura').value==='finger'?'none':'pan-y'});
 
 document.querySelectorAll('[data-clear]').forEach(b=>b.addEventListener('click',()=>canvases[b.dataset.clear==='sigFiscal'?'fiscal':'autuado']._clear()));
-function collect(){const n={...nowLocal()};return {id:currentId||('doc-'+Date.now()+'-'+Math.random().toString(36).slice(2,7)),type:val('tipo'),number:val('numero'),date:val('data'),time:val('hora'),natureza:val('natureza'),docId:val('docId'),nome:val('nome'),fantasia:val('fantasia'),cep:val('cep'),logradouro:val('logradouro'),numeroEndereco:val('numeroEndereco'),complemento:val('complemento'),bairro:val('bairro'),cidade:val('cidade'),uf:val('uf'),contato:val('contato'),local:val('local'),mesmoEnderecoOcorrencia:$('mesmoEnderecoOcorrencia').checked,gps:val('gps'),precisao:val('precisao'),assunto:val('assunto'),dataFato:val('dataFato'),descricao:val('descricao'),medida:val('medida'),prazo:val('prazo'),valor:val('tipo')==='Notificação'?'':val('valor'),laws:getSelectedLaws(),observacaoLegal:val('observacaoLegal'),fiscalNome:val('fiscalNome'),fiscalMatricula:val('fiscalMatricula'),fiscalCargo:val('fiscalCargo'),sigFiscal:(getActiveFiscalSignature()||canvases.fiscal._data()),sigAutuado:canvases.autuado._data(),recusa:$('recusa').checked,observacaoRecusa:val('observacaoRecusa'),updatedAt:new Date().toISOString(),status:'Salvo neste aparelho'}}
+function collect(){const n={...nowLocal()};return {id:currentId||('doc-'+Date.now()+'-'+Math.random().toString(36).slice(2,7)),type:val('tipo'),number:val('numero'),date:val('data'),time:val('hora'),natureza:val('natureza'),docId:val('docId'),nome:val('nome'),fantasia:val('fantasia'),cep:val('cep'),logradouro:val('logradouro'),numeroEndereco:val('numeroEndereco'),complemento:val('complemento'),bairro:val('bairro'),cidade:val('cidade'),uf:val('uf'),contato:val('contato'),local:val('local'),mesmoEnderecoOcorrencia:$('mesmoEnderecoOcorrencia').checked,gps:val('gps'),precisao:val('precisao'),assunto:val('assunto'),dataFato:val('dataFato'),descricao:val('descricao'),medida:val('medida'),prazo:val('prazo'),valor:val('tipo')==='Notificação'?'':moneyForStorage(val('valor')),laws:getSelectedLaws(),observacaoLegal:val('observacaoLegal'),fiscalNome:val('fiscalNome'),fiscalMatricula:val('fiscalMatricula'),fiscalCargo:val('fiscalCargo'),sigFiscal:(getActiveFiscalSignature()||canvases.fiscal._data()),sigAutuado:canvases.autuado._data(),recusa:$('recusa').checked,observacaoRecusa:val('observacaoRecusa'),updatedAt:new Date().toISOString(),status:'Salvo neste aparelho'}}
 function validate(){if(!$('nome').value.trim()||!$('descricao').value.trim()||!$('fiscalNome').value.trim()||!$('fiscalMatricula').value.trim()){alert('Preencha nome/razão social, descrição dos fatos, nome do fiscal e matrícula.');return false}return true}
 function saveDoc(){if(!validate())return null;const d=collect();const ix=docs.findIndex(x=>x.id===d.id);if(ix>=0)docs[ix]=d;else docs.unshift(d);store(STORAGE_DOCS,docs);currentId=d.id;saved=true;$('status').textContent=`Documento ${d.number} salvo neste aparelho.`;renderArchive();return d}
 $('salvar').addEventListener('click',saveDoc);
 $('pdf').addEventListener('click',async()=>{if(!validate())return;const d=collect();const ix=docs.findIndex(x=>x.id===d.id);if(ix>=0){docs[ix]=d;store(STORAGE_DOCS,docs)}else{docs.unshift(d);store(STORAGE_DOCS,docs);currentId=d.id;saved=true}await printDocument(d)});
-$('novoLimpo').addEventListener('click',()=>{if(!confirm('Iniciar um novo documento? O registro já salvo permanecerá no arquivo.'))return;$('docForm').reset();$('mesmoEnderecoOcorrencia').checked=false;$('local').readOnly=false;$('modoAssinatura').value='pen';$('modoAssinatura').dispatchEvent(new Event('change'));$('fiscalCargo').value='Fiscal Ambiental';Object.values(canvases).forEach(c=>c._clear());$('gps').value='';$('precisao').value='';$('mapLink').href='#';$('mapLink').textContent='Obter coordenadas para habilitar o mapa';$('abrirMapa').disabled=true;document.querySelectorAll('.lawcheck').forEach(c=>c.checked=false);const f=getFiscalProfile();if(f){$('fiscalNome').value=f.nome||'';$('fiscalMatricula').value=f.matricula||'';$('fiscalCargo').value=f.cargo||'Fiscal Ambiental';const sig=getActiveFiscalSignature();if(sig)restoreSig('sigFiscal',sig)}resetNumber();updateDocType()});
+$('novoLimpo').addEventListener('click',()=>{if(!confirm('Iniciar um novo documento? O registro já salvo permanecerá no arquivo.'))return;$('docForm').reset();$('mesmoEnderecoOcorrencia').checked=false;$('local').readOnly=false;$('modoAssinatura').value='pen';$('modoAssinatura').dispatchEvent(new Event('change'));$('fiscalCargo').value='Fiscal Ambiental';Object.values(canvases).forEach(c=>c._clear());$('gps').value='';$('precisao').value='';$('mapLink').href='#';$('mapLink').textContent='As coordenadas aparecerão aqui após a captura';document.querySelectorAll('.lawcheck').forEach(c=>c.checked=false);const f=getFiscalProfile();if(f){$('fiscalNome').value=f.nome||'';$('fiscalMatricula').value=f.matricula||'';$('fiscalCargo').value=f.cargo||'Fiscal Ambiental';const sig=getActiveFiscalSignature();if(sig)restoreSig('sigFiscal',sig)}resetNumber();updateDocType()});
 function field(label,value,full=false){return `<div class="print-field ${full?'print-full':''}"><div class="print-label">${esc(label)}</div><div class="print-value">${esc(value||'Não informado')}</div></div>`}
-function renderPrint(d){const legal=(d.laws||[]).length?d.laws.map(l=>`<div><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.name)} ${esc(l.device)}</a> <span>(${esc(l.topic)})</span></div>`).join(''):'Nenhum dispositivo selecionado';const mapsUrl=d.gps?`https://www.google.com/maps?q=${encodeURIComponent(d.gps.replace(/\s/g,''))}`:'';const sig=(data)=>data?`<img src="${data}" alt="Assinatura incorporada como imagem" draggable="false">`:'';const addr=[d.logradouro,d.numeroEndereco,d.complemento,d.bairro,d.cidade,d.uf,d.cep].filter(Boolean).join(', ');$('printArea').innerHTML=`<article class="print-sheet"><div class="print-head"><p>PREFEITURA MUNICIPAL DE IRECÊ • SECRETARIA MUNICIPAL DE MEIO AMBIENTE</p><h1>${esc(d.type.toUpperCase())}</h1><p><strong>Nº ${esc(d.number)}</strong> • Emissão: ${esc(dateBR(d.date))} às ${esc(d.time)}</p></div><h2>1. IDENTIFICAÇÃO DO AUTUADO / NOTIFICADO</h2><div class="print-grid">${field('Nome / razão social',d.nome)}${field('CPF / CNPJ',d.docId)}${field('Nome fantasia',d.fantasia)}${field('Contato',d.contato)}${field('Endereço cadastral',addr,true)}</div><h2>2. LOCAL DA OCORRÊNCIA</h2><div class="print-grid">${field('Local da ocorrência',d.local,true)}<div class="print-field print-full"><div class="print-label">Coordenadas</div><div class="print-value">${d.gps?`<a href="${mapsUrl}" target="_blank" rel="noopener">${esc(d.gps)}</a>`:'Não informadas'}</div></div>${field('Precisão GPS',d.precisao)}${field('Data dos fatos',dateBR(d.dataFato))}</div><h2>3. DESCRIÇÃO DA OCORRÊNCIA</h2><div class="print-grid">${field('Tema',d.assunto)}${d.type==='Notificação'?'':field('Valor da multa',d.valor)}${field('Descrição dos fatos',d.descricao,true)}${field('Medida / providência',d.medida,true)}${field('Prazo / orientação',d.prazo,true)}</div><h2>4. MARCO LEGAL</h2><div class="print-legal">${legal}${d.observacaoLegal?`<p>${esc(d.observacaoLegal)}</p>`:''}</div><h2>5. CIÊNCIA E ASSINATURAS</h2><div class="print-grid">${field('Fiscal responsável',d.fiscalNome)}${field('Matrícula / cargo',d.fiscalMatricula+' • '+d.fiscalCargo)}</div><div class="print-signatures"><div class="print-sign">${sig(d.sigFiscal)}<br>Assinatura do agente fiscal<br>${esc(d.fiscalNome)} • Matrícula ${esc(d.fiscalMatricula)}</div><div class="print-sign">${d.recusa?'RECUSA DE ASSINATURA REGISTRADA':sig(d.sigAutuado)}<br>Assinatura do autuado / notificado<br>${esc(d.nome)}${d.observacaoRecusa?'<br>'+esc(d.observacaoRecusa):''}</div></div><div class="print-foot"><span>Documento gerado pelo protótipo Fiscal Ambiental Irecê. Validar juridicamente antes do uso oficial.</span><span>Registro local: ${esc(d.id)}</span></div></article>`;$('printArea').classList.remove('hidden');return $('printArea')}
+function renderPrint(d){const legal=(d.laws||[]).length?d.laws.map(l=>`<div><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.name)} ${esc(l.device)}</a> <span>(${esc(l.topic)})</span></div>`).join(''):'Nenhum dispositivo selecionado';const mapsUrl=d.gps?`https://www.google.com/maps?q=${encodeURIComponent(d.gps.replace(/\s/g,''))}`:'';const sig=(data)=>data?`<img src="${data}" alt="Assinatura incorporada como imagem" draggable="false">`:'';const addr=[d.logradouro,d.numeroEndereco,d.complemento,d.bairro,d.cidade,d.uf,d.cep].filter(Boolean).join(', ');$('printArea').innerHTML=`<article class="print-sheet"><div class="print-head"><p>PREFEITURA MUNICIPAL DE IRECÊ • SECRETARIA MUNICIPAL DE MEIO AMBIENTE</p><h1>${esc(d.type.toUpperCase())}</h1><p><strong>Nº ${esc(d.number)}</strong> • Emissão: ${esc(dateBR(d.date))} às ${esc(d.time)}</p></div><h2>1. IDENTIFICAÇÃO DO AUTUADO / NOTIFICADO</h2><div class="print-grid">${field('Nome / razão social',d.nome)}${field('CPF / CNPJ',d.docId)}${field('Nome fantasia',d.fantasia)}${field('Contato',d.contato)}${field('Endereço cadastral',addr,true)}</div><h2>2. LOCAL DA OCORRÊNCIA</h2><div class="print-grid">${field('Local da ocorrência',d.local,true)}<div class="print-field print-full"><div class="print-label">Coordenadas</div><div class="print-value">${d.gps?`<a href="${mapsUrl}" target="_blank" rel="noopener">${esc(d.gps)}</a>`:'Não informadas'}</div></div>${field('Precisão GPS',d.precisao)}${field('Data dos fatos',dateBR(d.dataFato))}</div><h2>3. DESCRIÇÃO DA OCORRÊNCIA</h2><div class="print-grid">${field('Tema',d.assunto)}${d.type==='Notificação'?'':field('Valor da multa',d.valor ? d.valor+' ('+moneyInWords(d.valor)+')' : '',true)}${field('Descrição dos fatos',d.descricao,true)}${field('Medida / providência',d.medida,true)}${field('Prazo / orientação',d.prazo,true)}</div><h2>4. MARCO LEGAL</h2><div class="print-legal">${legal}${d.observacaoLegal?`<p>${esc(d.observacaoLegal)}</p>`:''}</div><h2>5. CIÊNCIA E ASSINATURAS</h2><div class="print-grid">${field('Fiscal responsável',d.fiscalNome)}${field('Matrícula / cargo',d.fiscalMatricula+' • '+d.fiscalCargo)}</div><div class="print-signatures"><div class="print-sign">${sig(d.sigFiscal)}<br>Assinatura do agente fiscal<br>${esc(d.fiscalNome)} • Matrícula ${esc(d.fiscalMatricula)}</div><div class="print-sign">${d.recusa?'RECUSA DE ASSINATURA REGISTRADA':sig(d.sigAutuado)}<br>Assinatura do autuado / notificado<br>${esc(d.nome)}${d.observacaoRecusa?'<br>'+esc(d.observacaoRecusa):''}</div></div><div class="print-foot"><span>Documento gerado pelo protótipo Fiscal Ambiental Irecê. Validar juridicamente antes do uso oficial.</span><span>Registro local: ${esc(d.id)}</span></div></article>`;$('printArea').classList.remove('hidden');return $('printArea')}
 async function waitForPrintImages(root){const imgs=[...root.querySelectorAll('img')];await Promise.all(imgs.map(img=>{if(img.complete&&img.naturalWidth>0)return Promise.resolve();return new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,2500)})}));if(document.fonts&&document.fonts.ready)await document.fonts.ready;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))}
 async function printDocument(d){const root=renderPrint(d);await waitForPrintImages(root);window.print()}
 window.addEventListener('afterprint',()=>{$('printArea').classList.add('hidden')});
 function renderArchive(){const q=val('buscaArquivo').toLowerCase(),type=val('filtroTipo'),year=val('filtroAno');const list=docs.filter(d=>(!q||[d.number,d.nome,d.docId,d.fantasia].some(x=>(x||'').toLowerCase().includes(q)))&&(!type||d.type===type)&&(!year||(d.date||'').startsWith(year))).sort((a,b)=>(b.updatedAt||'').localeCompare(a.updatedAt||''));$('archiveList').innerHTML=list.length?list.map(d=>`<div class="item"><div class="itemtop"><strong>${esc(d.type)} nº ${esc(d.number)}</strong><span class="pill">${esc(dateBR(d.date))}</span></div><p>${esc(d.nome)} • ${esc(d.docId||'Sem CPF/CNPJ')}</p><p>${esc(d.local||'Local não informado')}</p><div class="btnrow"><button class="btn secondary" data-open-doc="${esc(d.id)}">Abrir / editar</button><button class="btn outline" data-pdf-doc="${esc(d.id)}">Gerar PDF</button></div></div>`).join(''):'<div class="card empty">Nenhum documento encontrado.</div>'}
 ['buscaArquivo','filtroTipo','filtroAno'].forEach(id=>$(id).addEventListener('input',renderArchive));
 $('archiveList').addEventListener('click',e=>{const open=e.target.closest('[data-open-doc]'),pdf=e.target.closest('[data-pdf-doc]');if(open){const d=docs.find(x=>x.id===open.dataset.openDoc);if(d){loadDoc(d);switchTab('novo')}}if(pdf){const d=docs.find(x=>x.id===pdf.dataset.pdfDoc);if(d){printDocument(d)}}});
-function loadDoc(d){currentId=d.id;saved=true;const map={tipo:'type',numero:'number',data:'date',hora:'time',natureza:'natureza',docId:'docId',nome:'nome',fantasia:'fantasia',cep:'cep',logradouro:'logradouro',numeroEndereco:'numeroEndereco',complemento:'complemento',bairro:'bairro',cidade:'cidade',uf:'uf',contato:'contato',local:'local',gps:'gps',precisao:'precisao',assunto:'assunto',dataFato:'dataFato',descricao:'descricao',medida:'medida',prazo:'prazo',valor:'valor',observacaoLegal:'observacaoLegal',fiscalNome:'fiscalNome',fiscalMatricula:'fiscalMatricula',fiscalCargo:'fiscalCargo',observacaoRecusa:'observacaoRecusa'};Object.entries(map).forEach(([id,k])=>{if($(id))$(id).value=d[k]||''});$('recusa').checked=!!d.recusa;$('mesmoEnderecoOcorrencia').checked=!!d.mesmoEnderecoOcorrencia;syncOccurrenceAddress();$('modoAssinatura').value='pen';$('modoAssinatura').dispatchEvent(new Event('change'));updateDocType();document.querySelectorAll('.lawcheck').forEach(c=>c.checked=(d.laws||[]).some(l=>l.id===c.value));Object.values(canvases).forEach(c=>c._clear());restoreSig('sigFiscal',getActiveFiscalSignature()||d.sigFiscal);restoreSig('sigAutuado',d.sigAutuado);if(d.gps){$('mapLink').href='https://www.google.com/maps?q='+d.gps.replace(/\s/g,'');$('mapLink').textContent='Abrir coordenadas';$('abrirMapa').disabled=false}else{$('abrirMapa').disabled=true}$('status').textContent='Documento carregado do arquivo local. Alterações serão salvas ao clicar em Salvar.'}
+function loadDoc(d){currentId=d.id;saved=true;const map={tipo:'type',numero:'number',data:'date',hora:'time',natureza:'natureza',docId:'docId',nome:'nome',fantasia:'fantasia',cep:'cep',logradouro:'logradouro',numeroEndereco:'numeroEndereco',complemento:'complemento',bairro:'bairro',cidade:'cidade',uf:'uf',contato:'contato',local:'local',gps:'gps',precisao:'precisao',assunto:'assunto',dataFato:'dataFato',descricao:'descricao',medida:'medida',prazo:'prazo',valor:'valor',observacaoLegal:'observacaoLegal',fiscalNome:'fiscalNome',fiscalMatricula:'fiscalMatricula',fiscalCargo:'fiscalCargo',observacaoRecusa:'observacaoRecusa'};Object.entries(map).forEach(([id,k])=>{if($(id))$(id).value=d[k]||''});$('recusa').checked=!!d.recusa;$('mesmoEnderecoOcorrencia').checked=!!d.mesmoEnderecoOcorrencia;syncOccurrenceAddress();$('modoAssinatura').value='pen';$('modoAssinatura').dispatchEvent(new Event('change'));updateDocType();document.querySelectorAll('.lawcheck').forEach(c=>c.checked=(d.laws||[]).some(l=>l.id===c.value));Object.values(canvases).forEach(c=>c._clear());restoreSig('sigFiscal',getActiveFiscalSignature()||d.sigFiscal);restoreSig('sigAutuado',d.sigAutuado);if(d.gps){$('mapLink').href='https://www.google.com/maps?q='+d.gps.replace(/\s/g,'');$('mapLink').textContent=d.gps+' • abrir no Google Maps';}else{$('mapLink').href='#';$('mapLink').textContent='As coordenadas aparecerão aqui após a captura'}$('status').textContent='Documento carregado do arquivo local. Alterações serão salvas ao clicar em Salvar.'}
 function restoreSig(id,data){if(!data)return;const c=$(id);if(c&&typeof c._load==='function'){c._load(data);return}const img=new Image();img.onload=()=>{const ctx=c.getContext('2d'),r=c.getBoundingClientRect();ctx.clearRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,r.width,r.height)};img.src=data}
 $('exportar').addEventListener('click',()=>{const data={app:'Fiscal Ambiental Irecê',version:1,exportedAt:new Date().toISOString(),docs,counter,laws,fiscal:load(STORAGE_FISCAL,null)};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='backup-fiscal-ambiental-irece.json';a.click();URL.revokeObjectURL(a.href)});
 $('importarBtn').addEventListener('click',()=>$('importarArquivo').click());
